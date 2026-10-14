@@ -143,7 +143,11 @@ export class TextEngine {
   }
 
   setMode(mode: InputMode): boolean {
-    if (!this.commit()) return false;
+    if (!this.commit()) {
+      // Keep the visible digits of an unknown word when leaving T9.
+      this.insert(this.pendingText);
+      this.pending = null;
+    }
     this.mode = mode;
     return true;
   }

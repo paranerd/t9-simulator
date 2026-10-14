@@ -19,6 +19,8 @@ Monochromdisplay. Geschrieben in TypeScript und SCSS, ohne UI-Framework.
 - Abschaltbare, lokal erzeugte DTMF-Tastentöne und optionale Vibration.
 - Installierbare Offline-PWA, responsive für Mobilgeräte und Desktop.
 - Keine Anmeldung, kein Backend, keine Analyse- oder Trackingdienste.
+- Die Hauptansicht besteht ausschließlich aus dem Handy und einem Settings-Button.
+  Wörterbuch, Entwürfe, Postausgang und eigene Wörter sind in den Settings erreichbar.
 
 Das Gehäuse ist von klassischen Handys inspiriert und verwendet kein Markenlogo.
 Empfang und Akku auf dem Display sind dekorative Anzeigen. Das Senden ist
@@ -61,21 +63,24 @@ npm run preview
 Im ABC-Modus kurz warten oder die mittlere Navigationstaste drücken, bevor
 derselbe Knopf für den nächsten Buchstaben verwendet wird. Die Navigation
 links/rechts bestätigt ebenfalls den Buchstaben und bewegt zusätzlich den Cursor.
+T9 wird durch langes Drücken auf der `#`-Taste des Handys ein- oder ausgeschaltet.
+Der aktuelle Modus (T9 / ABC) ist im Display sichtbar.
 T9 zeigt zuerst ganze Wörter, danach passende Wortanfänge. Mit „Eigenes Wort
 hinzufügen“ lässt sich ein fehlendes Wort für die gewählte Sprache speichern.
+Diese Funktion befindet sich in den Settings.
 Bei einer unbekannten Ziffernfolge muss die Schreibweise zur Folge passen.
 
 ## Offline & Installation
 
-Einmal online öffnen und auf **„Offline bereit“** warten. Der Service Worker
+Einmal online öffnen und vollständig laden lassen. Der Service Worker
 lädt die gesamte App, beide Wörterbücher, Icons und Lizenztexte in den Cache.
 Danach funktionieren Schreiben, Entwürfe, Wörterbücher, Töne und Postausgang
 auch ohne Netzwerk. Die Entwicklungsansicht registriert bewusst keinen Service
 Worker; für Offline-Tests den Produktionsbuild mit `npm run preview` verwenden.
 
-- Android/Chromium/Desktop: „Installieren“ in der App oder im Browser.
+- Android/Chromium/Desktop: „App installieren“ in den Settings oder im Browser.
 - iPhone/iPad: Teilen-Menü → „Zum Home-Bildschirm“.
-- Updates: „Update laden“ erscheint, wenn eine neue Version bereitsteht. Der
+- Updates: „Update laden“ erscheint in den Settings, wenn eine neue Version bereitsteht. Der
   aktuelle Text wird vor dem Neuladen gespeichert.
 
 Vibration ist nur auf Geräten verfügbar, die die Vibration API unterstützen;
@@ -105,7 +110,7 @@ Manifest und Service Worker. Bei Umbenennung des Repositories müssen `base`,
 - `src/main.ts`: Oberfläche, Bedienung und PWA-Registrierung.
 - `src/style.scss`: responsive Retro-Gestaltung.
 - `src/data/`: nach Häufigkeit geordnete Offline-Wortlisten.
-- `tests/`: 18 automatisierte Prüfungen.
+- `tests/`: 19 automatisierte Prüfungen.
 
 ## Wörterbücher & Lizenz
 

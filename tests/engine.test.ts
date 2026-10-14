@@ -65,6 +65,17 @@ describe('T9 and personal learning', () => {
   });
 });
 describe('Cursor and letter case', () => {
+  it('can turn T9 off and on with an unknown word without losing visible text', () => {
+    const engine = setup(); engine.setText('A B'); engine.moveCursor(-1);
+    for (const digit of '999999') engine.tap(digit);
+    expect(engine.isUnknown).toBe(true);
+    const value = engine.value;
+    expect(engine.setMode('abc')).toBe(true);
+    expect(engine.mode).toBe('abc'); expect(engine.sequence).toBe('');
+    expect(engine.value).toBe(value); expect(engine.cursor).toBe(8);
+    expect(engine.setMode('t9')).toBe(true); expect(engine.mode).toBe('t9');
+    expect(engine.value).toBe(value);
+  });
   it('inserts and deletes inside a message, including non-BMP characters', () => {
     const engine = setup(); engine.setText('A😀B'); engine.moveCursor(-1); engine.backspace();
     engine.digit('3'); expect(engine.value).toBe('A3B');

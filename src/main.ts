@@ -31,32 +31,8 @@ let toastTimer: ReturnType<typeof setTimeout>;
 let updateServiceWorker: (reload?: boolean) => Promise<void>;
 
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-  <header class="site-header">
-    <a class="brand" href="./" aria-label="T9 Simulator Startseite"><span class="brand-symbol">t9<span></span></span><span>TEXTING<br>SIMULATOR</span></a>
-    <nav class="header-actions" aria-label="App">
-      <span class="offline-badge" id="offline-badge"><i></i><span>Offline wird vorbereitet</span></span>
-      <button class="quiet-button" id="install-button" aria-label="App installieren" hidden>${icons.download}<span>Installieren</span></button>
-      <button class="quiet-button" id="settings-button" aria-label="Einstellungen">${icons.settings}<span>Einstellungen</span></button>
-    </nav>
-  </header>
+  <button class="settings-button" id="settings-button" aria-label="Einstellungen">${icons.settings}</button>
   <main class="stage">
-    <section class="intro" aria-labelledby="title">
-      <p class="eyebrow"><span></span> WENIGER TASTEN. MEHR GEFÜHL.</p>
-      <h1 id="title">Ein Tastendruck<br> <em>zurück.</em></h1>
-      <p class="intro-copy">Als eine Nachricht noch ein bisschen<br class="desktop-break"> Fingerspitzengefühl brauchte.</p>
-      <div class="input-options">
-        <div class="mode-switch" role="group" aria-label="Schreibmodus">
-          <button data-mode="t9" aria-pressed="true"><strong>T9</strong><span>Worterkennung</span></button>
-          <button data-mode="abc" aria-pressed="false"><strong>ABC</strong><span>Mehrfachdrücken</span></button>
-        </div>
-        <label class="language-select"><span>Wörterbuch</span><select id="language" aria-label="T9-Wörterbuch"><option value="de">Deutsch</option><option value="en">English</option></select></label>
-      </div>
-      <div class="memory-links">
-        <button id="drafts-button">Entwürfe <span id="draft-count">0</span></button>
-        <button id="sent-button">Postausgang <span id="sent-count">0</span></button>
-      </div>
-      <p class="privacy-note">Deine Worte bleiben auf deinem Gerät.</p>
-    </section>
     <section class="phone-area" aria-label="Retro-Handy">
       <div class="phone" id="phone">
         <div class="speaker" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
@@ -66,7 +42,7 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
             <div class="status-bar"><span class="signal" aria-label="Simulierter Empfang"><i></i><i></i><i></i><i></i></span><span id="lcd-mode">T9 · Abc</span><span class="battery" aria-label="Simulierter voller Akku"></span></div>
             <div class="screen-heading"><span>Nachricht schreiben</span><span id="screen-language">DE</span></div>
             <div class="message-screen" id="message-screen" role="textbox" aria-label="Nachricht. Eingabe über die Handytasten oder Zahlentasten." aria-readonly="true" aria-multiline="true" tabindex="0"></div>
-            <div class="lcd-hint"><span id="lcd-hint">Bereit, wenn du es bist.</span><span id="lcd-candidates"></span></div>
+            <div class="lcd-status"><span id="phone-status" role="status" aria-live="polite"></span><span id="lcd-candidates"></span></div>
             <div class="screen-footer"><span id="sms-count">160 frei · 1 SMS</span><span id="character-count">0</span></div>
             <div class="lcd-soft-labels" aria-hidden="true"><span>Speichern</span><span>Löschen</span></div>
           </div>
@@ -83,37 +59,20 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
           <div class="soft-column"><button class="soft-key" id="delete-button" aria-label="Letztes Zeichen löschen"><span></span></button><button class="end-key" id="new-button" aria-label="Neue Nachricht beginnen">${icons.backspace}</button></div>
         </div>
         <div class="keypad" aria-label="Handytastatur">
-          ${[['1', '.,?!'], ['2', 'abc'], ['3', 'def'], ['4', 'ghi'], ['5', 'jkl'], ['6', 'mno'], ['7', 'pqrs'], ['8', 'tuv'], ['9', 'wxyz'], ['*', '+ / @'], ['0', '␣'], ['#', 'a ⇄ A']].map(([key, letters]) => `<button class="number-key key-${key === '*' ? 'star' : key === '#' ? 'hash' : key}" data-key="${key}" aria-label="${key === '*' ? 'Stern: nächstes Wort oder Sonderzeichen' : key === '#' ? 'Raute: Groß- und Kleinschreibung' : key === '0' ? '0: Leerzeichen' : `${key}: ${letters}`}" aria-keyshortcuts="${key}"><span class="key-number">${key}</span><span class="key-letters">${letters}</span></button>`).join('')}
+          ${[['1', '.,?!'], ['2', 'abc'], ['3', 'def'], ['4', 'ghi'], ['5', 'jkl'], ['6', 'mno'], ['7', 'pqrs'], ['8', 'tuv'], ['9', 'wxyz'], ['*', '+ / @'], ['0', '␣'], ['#', 'T9']].map(([key, letters]) => `<button class="number-key key-${key === '*' ? 'star' : key === '#' ? 'hash' : key}" data-key="${key}" aria-label="${key === '*' ? 'Stern: nächstes Wort oder Sonderzeichen' : key === '#' ? 'Raute: Groß- und Kleinschreibung; halten zum Ein- oder Ausschalten von T9' : key === '0' ? '0: Leerzeichen' : `${key}: ${letters}`}" aria-keyshortcuts="${key}"><span class="key-number">${key}</span><span class="key-letters">${letters}</span></button>`).join('')}
         </div>
         <div class="phone-bottom" aria-hidden="true"><span></span><i></i><span></span></div>
       </div>
-      <p class="phone-caption"><span class="caption-dot"></span> KEIN NETZ NÖTIG. NUR DEINE DAUMEN.</p>
     </section>
-    <aside class="guide">
-      <div class="guide-heading"><span>01 /</span><h2>So ging das.</h2></div>
-      <p id="mode-description">Einmal pro Buchstabe drücken.<br>T9 findet das passende Wort.</p>
-      <dl class="key-guide">
-        <div><dt><kbd>0</kbd></dt><dd>Leerzeichen</dd></div>
-        <div><dt><kbd>*</kbd></dt><dd id="star-guide">Nächstes Wort</dd></div>
-        <div><dt><kbd>#</kbd></dt><dd>Groß / klein</dd></div>
-        <div><dt><kbd>1</kbd></dt><dd>Satzzeichen</dd></div>
-      </dl>
-      <p class="hold-hint">Taste halten → Ziffer<br><span># halten → T9 / ABC</span></p>
-      <div class="prediction-panel"><p class="eyebrow">WORTVORSCHLÄGE</p><div id="suggestions"><p class="suggestions-empty">Dein nächstes Wort<br>beginnt hier.</p></div><button id="add-word-button" class="text-button">+ Eigenes Wort hinzufügen</button></div>
-      <button class="text-button help-button" id="help-button">Auch mit deiner Tastatur ${icons.arrow}</button>
-    </aside>
   </main>
-  <footer class="site-footer"><span>12 Tasten. Unendlich viele Geschichten.</span><a href="https://github.com/paranerd/t9-simulator" target="_blank" rel="noopener noreferrer">GitHub ↗</a></footer>
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <dialog id="dialog" class="dialog"><div class="dialog-top"><span class="eyebrow">T9 SIMULATOR</span><button id="close-dialog" aria-label="Dialog schließen">×</button></div><div id="dialog-content"></div></dialog>
 `;
 
 const $ = <T extends HTMLElement = HTMLElement>(selector: string): T => document.querySelector<T>(selector)!;
 function toast(message: string): void {
-  $('#toast').textContent = message;
-  $('#toast').classList.add('visible');
+  $('#phone-status').textContent = message;
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => $('#toast').classList.remove('visible'), 3800);
+  toastTimer = setTimeout(() => { $('#phone-status').textContent = ''; }, 3800);
 }
 
 function persist(): boolean {
@@ -130,7 +89,7 @@ function render(): void {
   const characters = Array.from(engine.text);
   const before = characters.slice(0, engine.cursor).join('');
   const after = characters.slice(engine.cursor).join('');
-  $('#message-screen').innerHTML = `${!engine.value ? '<span class="screen-placeholder">Was möchtest du<br>erzählen?</span>' : ''}${escapeHtml(before)}<span class="pending-word${engine.isUnknown ? ' unknown' : ''}">${escapeHtml(engine.pendingText)}</span><span class="cursor" aria-hidden="true"></span>${escapeHtml(after)}`;
+  $('#message-screen').innerHTML = `${escapeHtml(before)}<span class="pending-word${engine.isUnknown ? ' unknown' : ''}">${escapeHtml(engine.pendingText)}</span><span class="cursor" aria-hidden="true"></span>${escapeHtml(after)}`;
   $('#message-screen').setAttribute('aria-label', `Nachricht: ${engine.value || 'leer'}. Eingabe über die Handytasten oder Zahlentasten.`);
   $('.cursor').scrollIntoView({ block: 'nearest', inline: 'nearest' });
   const sms = smsInfo(engine.value);
@@ -139,15 +98,7 @@ function render(): void {
   $('#character-count').textContent = String(Array.from(engine.value).length);
   $('#lcd-mode').textContent = `${engine.mode === 't9' ? 'T9' : 'ABC'} · ${engine.casing === 'auto' ? 'Abc' : engine.casing === 'upper' ? 'ABC' : 'abc'}`;
   $('#screen-language').textContent = state.settings.language.toUpperCase();
-  $('#lcd-hint').textContent = engine.isUnknown ? 'Wort fehlt? Bitte hinzufügen.' : engine.sequence ? '★ nächstes Wort · 0 fertig' : engine.expires ? 'Kurz warten für nächsten Buchstaben' : 'Bereit, wenn du es bist.';
-  $('#lcd-candidates').textContent = engine.sequence && !engine.isUnknown ? `${engine.candidateIndex + 1}/${engine.candidates.length}` : '';
-  for (const button of document.querySelectorAll<HTMLButtonElement>('[data-mode]')) button.setAttribute('aria-pressed', String(button.dataset.mode === engine.mode));
-  $('#mode-description').innerHTML = engine.mode === 't9' ? 'Einmal pro Buchstabe drücken.<br>T9 findet das passende Wort.' : 'Mehrmals für einen Buchstaben.<br>Zum Beispiel: 2 → a → b → c.';
-  $('#star-guide').textContent = engine.mode === 't9' ? 'Nächstes Wort' : 'Sonderzeichen';
-  const candidates = engine.candidates;
-  $('#suggestions').innerHTML = engine.isUnknown ? '<p class="suggestions-empty">Dieses Wort fehlt noch.<br>Bring es deinem Handy bei.</p>' : candidates.length ? `<div class="candidate-list">${candidates.map((word, index) => `<button data-candidate="${index}" aria-pressed="${index === engine.candidateIndex}"${index === engine.candidateIndex ? ' class="selected"' : ''}>${escapeHtml(word)}</button>`).join('')}</div>` : `<p class="suggestions-empty">${engine.mode === 't9' ? 'Dein nächstes Wort<br>beginnt hier.' : 'Buchstabe für Buchstabe.<br>Ganz wie früher.'}</p>`;
-  $('#draft-count').textContent = String(state.drafts.length);
-  $('#sent-count').textContent = String(state.sent.length);
+  $('#lcd-candidates').textContent = engine.isUnknown ? '?' : engine.sequence ? `${engine.candidateIndex + 1}/${engine.candidates.length}` : '';
   clearTimeout(timer);
   if (engine.expires !== null) timer = setTimeout(() => { engine.expire(Date.now()); render(); }, Math.max(0, engine.expires - Date.now()) + 5);
   persist();
@@ -203,11 +154,6 @@ for (const button of document.querySelectorAll<HTMLButtonElement>('[data-key]'))
   button.addEventListener('lostpointercapture', release);
   button.addEventListener('click', () => { if (!held) press(button.dataset.key!); held = false; });
 }
-for (const button of document.querySelectorAll<HTMLButtonElement>('[data-mode]')) button.addEventListener('click', () => setMode(button.dataset.mode as InputMode));
-$('#suggestions').addEventListener('click', event => {
-  const button = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-candidate]');
-  if (button) { engine.chooseCandidate(Number(button.dataset.candidate)); render(); }
-});
 $('#delete-button').addEventListener('click', () => { engine.backspace(); feedback(); render(); });
 for (const button of document.querySelectorAll<HTMLButtonElement>('[data-action]')) button.addEventListener('click', () => {
   const action = button.dataset.action;
@@ -218,18 +164,10 @@ for (const button of document.querySelectorAll<HTMLButtonElement>('[data-action]
   else result(engine.commit());
   feedback(); render();
 });
-$('#language').addEventListener('change', () => {
-  if (!engine.commit()) { $<HTMLSelectElement>('#language').value = state.settings.language; openWordDialog(); return; }
-  state.settings.language = $<HTMLSelectElement>('#language').value as Language;
-  engine.dictionary = dictionaries[state.settings.language];
-  render();
-});
-$<HTMLSelectElement>('#language').value = state.settings.language;
-
 const dialog = $<HTMLDialogElement>('#dialog');
 let priorFocus: HTMLElement | null = null;
 function openDialog(content: string): void {
-  priorFocus = document.activeElement as HTMLElement;
+  if (!dialog.open) priorFocus = document.activeElement as HTMLElement;
   $('#dialog-content').innerHTML = content;
   if (!dialog.open) dialog.showModal();
 }
@@ -251,7 +189,6 @@ function openWordDialog(): void {
   });
   $<HTMLInputElement>('#new-word').focus();
 }
-$('#add-word-button').addEventListener('click', openWordDialog);
 
 function createMessage(): Message { return { id: crypto.randomUUID(), text: engine.value, date: Date.now() }; }
 function saveDraft(showToast = true): boolean {
@@ -301,16 +238,41 @@ function openFolder(folder: 'drafts' | 'sent'): void {
     }
   });
 }
-$('#drafts-button').addEventListener('click', () => openFolder('drafts'));
-$('#sent-button').addEventListener('click', () => openFolder('sent'));
 
 function openSettings(): void {
-  openDialog(`<h2>Dein Handy. Dein Gefühl.</h2><p>Ein bisschen Nostalgie, ganz nach deinem Geschmack.</p><label class="setting-row"><span><strong>Tastentöne</strong><small>Die klassischen Doppeltöne</small></span><input type="checkbox" id="sound" ${state.settings.sound ? 'checked' : ''}></label><label class="setting-row"><span><strong>Vibration</strong><small>Wenn dein Gerät sie unterstützt</small></span><input type="checkbox" id="vibration" ${state.settings.vibration ? 'checked' : ''}></label><div class="settings-info"><strong>Alles bleibt lokal.</strong><p>Texte, Entwürfe und gelernte Wörter werden in diesem Browser gespeichert. Das Leeren der Browserdaten entfernt sie.</p><p>Für iPhone und iPad: im Teilen-Menü „Zum Home-Bildschirm“ wählen. Auf Android und Desktop erscheint „Installieren“, sobald der Browser die App anbietet.</p><p>Nach „Offline bereit“ funktionieren beide Wörterbücher, Töne und Nachrichten ohne Internet.</p></div><details class="credits"><summary>Wörterbücher & Lizenzen</summary><p>25.000 Wörter je Sprache, aus <a href="https://github.com/rspeer/wordfreq" target="_blank" rel="noopener noreferrer">wordfreq 3.1.1</a> von Robyn Speer. Die bearbeiteten Wortlisten stehen unter CC BY-SA 4.0; der App-Code unter MIT.</p><p>Quellen: Wikipedia, Leeds Internet Corpus, ParaCrawl, Google Books, OpenSubtitles und die frei verfügbaren SUBTLEX-Daten von Marc Brysbaert et al.</p><a href="${import.meta.env.BASE_URL}licenses/wordfreq-notice.txt" target="_blank" rel="noopener noreferrer">Vollständige Hinweise & Datenlizenz ↗</a></details>`);
+  openDialog(`<h2>Einstellungen</h2>
+    <label class="setting-row"><span><strong>Tastentöne</strong></span><input type="checkbox" id="sound" ${state.settings.sound ? 'checked' : ''}></label>
+    <label class="setting-row"><span><strong>Vibration</strong></span><input type="checkbox" id="vibration" ${state.settings.vibration ? 'checked' : ''}></label>
+    <label class="setting-row"><span><strong>Wörterbuch</strong></span><select id="language" aria-label="T9-Wörterbuch"><option value="de">Deutsch</option><option value="en">English</option></select></label>
+    <div class="settings-actions">
+      <button class="setting-action" id="drafts-button">Entwürfe <span>${state.drafts.length}</span></button>
+      <button class="setting-action" id="sent-button">Postausgang <span>${state.sent.length}</span></button>
+      <button class="setting-action" id="add-word-button">Eigenes Wort hinzufügen ${icons.arrow}</button>
+      <button class="setting-action" id="install-button" hidden></button>
+    </div>
+    <details class="credits"><summary>Wörterbücher & Lizenzen</summary><p>25.000 Wörter je Sprache, aus <a href="https://github.com/rspeer/wordfreq" target="_blank" rel="noopener noreferrer">wordfreq 3.1.1</a> von Robyn Speer. Die bearbeiteten Wortlisten stehen unter CC BY-SA 4.0; der App-Code unter MIT.</p><p>Quellen: Wikipedia, Leeds Internet Corpus, ParaCrawl, Google Books, OpenSubtitles und die frei verfügbaren SUBTLEX-Daten von Marc Brysbaert et al.</p><a href="${import.meta.env.BASE_URL}licenses/wordfreq-notice.txt" target="_blank" rel="noopener noreferrer">Vollständige Hinweise & Datenlizenz ↗</a></details>`);
   $('#sound').addEventListener('change', () => { state.settings.sound = $<HTMLInputElement>('#sound').checked; persist(); feedback(); });
   $('#vibration').addEventListener('change', () => { state.settings.vibration = $<HTMLInputElement>('#vibration').checked; persist(); feedback(); });
+  $<HTMLSelectElement>('#language').value = state.settings.language;
+  $('#language').addEventListener('change', () => {
+    if (!engine.commit()) { $<HTMLSelectElement>('#language').value = state.settings.language; openWordDialog(); return; }
+    state.settings.language = $<HTMLSelectElement>('#language').value as Language;
+    engine.dictionary = dictionaries[state.settings.language];
+    render();
+  });
+  $('#drafts-button').addEventListener('click', () => openFolder('drafts'));
+  $('#sent-button').addEventListener('click', () => openFolder('sent'));
+  $('#add-word-button').addEventListener('click', openWordDialog);
+  $('#install-button').addEventListener('click', async () => {
+    if (updateReady) { persist(); await updateServiceWorker(true); }
+    else if (installEvent) {
+      await installEvent.prompt(); await installEvent.userChoice;
+      installEvent = undefined; syncPwaAction();
+    }
+  });
+  syncPwaAction();
 }
 $('#settings-button').addEventListener('click', openSettings);
-$('#help-button').addEventListener('click', () => openDialog(`<h2>Deine Tastatur kann das auch.</h2><dl class="shortcut-list"><div><dt>0–9, * und #</dt><dd>Handytasten</dd></div><div><dt>Leertaste</dt><dd>Wort fertig + Leerzeichen</dd></div><div><dt>↑ / ↓</dt><dd>T9-Vorschläge durchschalten</dd></div><div><dt>← / →</dt><dd>Cursor bewegen</dd></div><div><dt>Backspace</dt><dd>Ein Zeichen löschen</dd></div><div><dt>Enter</dt><dd>Wort bestätigen</dd></div><div><dt>Shift + Enter</dt><dd>Zeilenumbruch</dd></div></dl><p class="dialog-note">Zifferntasten halten, um eine Zahl einzufügen. # halten wechselt den Schreibmodus. Im ABC-Modus: 850 ms warten oder mit → bestätigen, bevor du denselben Knopf für den nächsten Buchstaben drückst.</p>`));
 
 const keyboard = new Map<string, { start: number; key: string; held: boolean; timer: ReturnType<typeof setTimeout> }>();
 window.addEventListener('keydown', event => {
@@ -345,41 +307,25 @@ window.addEventListener('blur', () => {
 });
 window.addEventListener('pagehide', persist);
 
-let offlineReady = false;
 let updateReady = false;
-function connectionBadge(): void {
-  const badge = $('#offline-badge');
-  badge.classList.toggle('ready', offlineReady);
-  badge.querySelector('span')!.textContent = !navigator.onLine ? offlineReady ? 'Offline · bereit' : 'Keine Verbindung' : offlineReady ? 'Offline bereit' : 'Offline wird vorbereitet';
+type InstallEvent = Event & { prompt: () => Promise<void>; userChoice: Promise<{ outcome: string }> };
+let installEvent: InstallEvent | undefined;
+function syncPwaAction(): void {
+  const button = document.querySelector<HTMLButtonElement>('#install-button');
+  if (!button) return;
+  button.hidden = !updateReady && !installEvent;
+  button.innerHTML = `${updateReady ? 'Update laden' : 'App installieren'} ${icons.download}`;
 }
-window.addEventListener('online', connectionBadge);
-window.addEventListener('offline', connectionBadge);
 if ('serviceWorker' in navigator) {
   updateServiceWorker = registerSW({
     immediate: true,
-    onOfflineReady() { offlineReady = true; connectionBadge(); },
-    onNeedRefresh() {
-      updateReady = true;
-      $('#install-button').hidden = false;
-      $('#install-button').setAttribute('aria-label', 'App-Update laden');
-      $('#install-button').innerHTML = `${icons.download}<span>Update laden</span>`;
-    },
-    onRegisteredSW(_url, registration) {
-      if (registration?.active) { offlineReady = true; connectionBadge(); }
-    },
-    onRegisterError() { $('#offline-badge span').textContent = 'Offline noch nicht bereit'; }
+    onNeedRefresh() { updateReady = true; syncPwaAction(); },
+    onRegisterError() { toast('Offline-Funktion nicht verfügbar.'); }
   });
 }
-type InstallEvent = Event & { prompt: () => Promise<void>; userChoice: Promise<{ outcome: string }> };
-let installEvent: InstallEvent | undefined;
 window.addEventListener('beforeinstallprompt', event => {
-  event.preventDefault(); installEvent = event as InstallEvent;
-  $('#install-button').hidden = false;
+  event.preventDefault(); installEvent = event as InstallEvent; syncPwaAction();
 });
-window.addEventListener('appinstalled', () => { installEvent = undefined; if (!updateReady) $('#install-button').hidden = true; toast('Dein Retro-Handy ist installiert.'); });
-$('#install-button').addEventListener('click', async () => {
-  if (updateReady) { persist(); await updateServiceWorker(true); }
-  else if (installEvent) { await installEvent.prompt(); await installEvent.userChoice; installEvent = undefined; $('#install-button').hidden = true; }
-});
+window.addEventListener('appinstalled', () => { installEvent = undefined; syncPwaAction(); });
 
-render(); connectionBadge();
+render();
