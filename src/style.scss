@@ -53,11 +53,12 @@ svg { width: 20px; height: 20px; flex-shrink: 0; }
 .end-key { color: #d29380; align-self: flex-end; }
 .rocker {
   position: relative; width: 146px; height: 146px; border-radius: 44px; background: linear-gradient(125deg, #e0e3dd, #9da8a5 75%); border: 1px solid #172538; box-shadow: inset 1px 1px 1px #fff9, inset -1px -1px 1px #506177, 0 2px 2px #142030;
-  button { padding: 0; position: absolute; width: 48px; height: 48px; border: none; background: none; color: #566473; font-size: 20px; line-height: 1; &:active { color: #1d3429; } }
+  button { display: grid; place-items: center; padding: 0; position: absolute; width: 48px; height: 48px; border: none; background: none; color: #566473; font-size: 20px; line-height: 1; &:active { color: #1d3429; } }
+  button svg { width: 22px; height: 22px; pointer-events: none; transform: rotate(var(--arrow-rotation, 0deg)); }
   .rocker-up { left: 48px; top: 0; }
-  .rocker-down { left: 48px; bottom: 0; }
-  .rocker-left { left: 0; top: 48px; font-size: 28px; }
-  .rocker-right { right: 0; top: 48px; font-size: 28px; }
+  .rocker-down { --arrow-rotation: 180deg; left: 48px; bottom: 0; }
+  .rocker-left { --arrow-rotation: -90deg; left: 0; top: 48px; }
+  .rocker-right { --arrow-rotation: 90deg; right: 0; top: 48px; }
   .rocker-center { left: 48px; top: 48px; border-radius: 12px; font-size: 9px; background: linear-gradient(130deg, #687587, #3c4c60); border: 1px solid #243145; color: #d1d9d3; box-shadow: inset 1px 1px 1px #c6d1d759; }
 }
 .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px 11px; padding: 4px 5px 0; }

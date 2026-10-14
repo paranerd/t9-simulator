@@ -8,6 +8,7 @@ import { readState, saveState, SENT_LIMIT, type Message } from './storage';
 import { registerSW } from 'virtual:pwa-register';
 
 const icons = {
+  navigation: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m6 15 6-6 6 6"/></svg>',
   call: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m7 3 3 5-3 3a16 16 0 0 0 6 6l3-3 5 3-1 4C10 22 2 14 3 4Z"/></svg>',
   hangup: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 13c5-6 15-6 20 0l-2 4-5-2v-4a12 12 0 0 0-6 0v4l-5 2Z"/></svg>',
 };
@@ -57,11 +58,11 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
         <div class="navigation-keys">
           <div class="soft-column"><button class="soft-key" id="send-button" aria-label="Senden"><span></span></button><button class="call-key" id="call-button" aria-label="Anruf annehmen">${icons.call}</button></div>
           <div class="rocker" aria-label="Navigation">
-            <button class="rocker-up" data-action="next" aria-label="Nächster T9-Vorschlag">▴</button>
-            <button class="rocker-left" data-action="left" aria-label="Cursor nach links">‹</button>
+            <button class="rocker-up" data-action="next" aria-label="Nächster T9-Vorschlag">${icons.navigation}</button>
+            <button class="rocker-left" data-action="left" aria-label="Cursor nach links">${icons.navigation}</button>
             <button class="rocker-center" data-action="confirm" aria-label="Wort bestätigen">●</button>
-            <button class="rocker-right" data-action="right" aria-label="Cursor nach rechts">›</button>
-            <button class="rocker-down" data-action="previous" aria-label="Vorheriger T9-Vorschlag">▾</button>
+            <button class="rocker-right" data-action="right" aria-label="Cursor nach rechts">${icons.navigation}</button>
+            <button class="rocker-down" data-action="previous" aria-label="Vorheriger T9-Vorschlag">${icons.navigation}</button>
           </div>
           <div class="soft-column"><button class="soft-key" id="delete-button" aria-label="Letztes Zeichen löschen"><span></span></button><button class="end-key" id="hangup-button" aria-label="Auflegen – Hauptmenü öffnen">${icons.hangup}</button></div>
         </div>
