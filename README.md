@@ -13,14 +13,17 @@ Monochromdisplay. Geschrieben in TypeScript und SCSS, ohne UI-Framework.
 - Deutsche Umlaute und ß, Satzzeichen, Sonderzeichen und Groß-/Kleinschreibung.
 - Touch-, Maus- und Tastaturbedienung; Taste halten für Ziffern.
 - Cursorbewegung, Zeilenumbrüche und korrekter SMS-Zähler für GSM-7 und Unicode.
-- Automatisch gesicherter aktueller Text, bis zu 100 Entwürfe und 100 simuliert
-  gesendete Nachrichten. Beim Starten einer neuen Nachricht wird der alte Text
-  als Entwurf gesichert.
+- Automatisch gesicherter aktueller Text und die letzten fünf simuliert gesendeten
+  Nachrichten. Nach dem Senden ist das Schreibfeld für eine neue Nachricht frei.
 - Abschaltbare, lokal erzeugte DTMF-Tastentöne und optionale Vibration.
 - Installierbare Offline-PWA, responsive für Mobilgeräte und Desktop.
+- Einheitliche Handyform auf allen Bildschirmen: Gehäuse, Display und Tasten werden
+  gemeinsam skaliert. Auf sehr niedrigen Displays bleibt das Handy scrollbar,
+  damit die Tasten groß genug zum Antippen bleiben.
 - Keine Anmeldung, kein Backend, keine Analyse- oder Trackingdienste.
-- Die Hauptansicht besteht ausschließlich aus dem Handy und einem Settings-Button.
-  Wörterbuch, Entwürfe, Postausgang und eigene Wörter sind in den Settings erreichbar.
+- Die Hauptansicht besteht ausschließlich aus dem Handy. Auflegen öffnet das
+  Hauptmenü mit „Schreiben“, „Gesendet“ und „Einstellungen“.
+- Doppeltippen zoomt das Interface nicht; Zoomen mit zwei Fingern bleibt möglich.
 
 Das Gehäuse ist von klassischen Handys inspiriert und verwendet kein Markenlogo.
 Empfang und Akku auf dem Display sind dekorative Anzeigen. Das Senden ist
@@ -47,6 +50,10 @@ npm run preview
 
 | Taste | Funktion |
 | --- | --- |
+| Linke Funktionstaste | Nachricht senden; im Menü Auswahl mit „OK“ öffnen |
+| Rechte Funktionstaste | Zeichen löschen; im Menü zurück |
+| Grüne Hörertaste | Anruf annehmen (ohne eingehenden Anruf nur ein Hinweis) |
+| Rote Hörertaste | Auflegen und Hauptmenü öffnen |
 | 2–9 | T9: ein Druck pro Buchstabe; ABC: durch Buchstaben schalten |
 | 0 / Leertaste | Wort bestätigen, Leerzeichen |
 | * | T9: nächster Vorschlag; sonst Sonderzeichen |
@@ -59,6 +66,18 @@ npm run preview
 | Enter | Wort bestätigen |
 | Shift + Enter | Zeilenumbruch |
 | Backspace | Letztes Zeichen entfernen |
+
+Im Hauptmenü und unter „Gesendet“ wählen ↑ / ↓ einen Eintrag aus; die linke
+Funktionstaste oder die mittlere Navigationstaste öffnet ihn. Auch Enter bestätigt,
+Backspace oder Escape führt zurück. Die Einträge lassen sich direkt antippen.
+„Gesendet“ zeigt die letzten fünf Nachrichten, neueste zuerst. Das Senden benötigt
+keine Rückfrage und zeigt kurz „Nachricht gesendet“. Es bleibt eine lokale Simulation.
+Beim Wechsel ins Hauptmenü bleibt die gerade geschriebene Nachricht erhalten.
+Auch die Einstellungen und ihre Unteransichten erscheinen direkt im Handy-Display.
+Mit ↑ / ↓ auswählen und „OK“ bestätigen: Tastentöne und Vibration wechseln zwischen
+An/Aus, das Wörterbuch zwischen DE/EN. Eigene Wörter lassen sich per Mehrfachdrücken
+auf den Handytasten oder direkt im Eingabefeld schreiben und mit „OK“ hinzufügen.
+„Zurück“ führt zum vorherigen Menü, Auflegen immer zum Hauptmenü.
 
 Im ABC-Modus kurz warten oder die mittlere Navigationstaste drücken, bevor
 derselbe Knopf für den nächsten Buchstaben verwendet wird. Die Navigation
@@ -74,7 +93,7 @@ Bei einer unbekannten Ziffernfolge muss die Schreibweise zur Folge passen.
 
 Einmal online öffnen und vollständig laden lassen. Der Service Worker
 lädt die gesamte App, beide Wörterbücher, Icons und Lizenztexte in den Cache.
-Danach funktionieren Schreiben, Entwürfe, Wörterbücher, Töne und Postausgang
+Danach funktionieren Schreiben, gesendete Nachrichten, Wörterbücher und Töne
 auch ohne Netzwerk. Die Entwicklungsansicht registriert bewusst keinen Service
 Worker; für Offline-Tests den Produktionsbuild mit `npm run preview` verwenden.
 

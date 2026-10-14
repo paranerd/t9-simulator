@@ -7,16 +7,16 @@ export type State = {
   version: 1;
   settings: Settings;
   active: { text: string; sequence: string };
-  drafts: Message[];
   sent: Message[];
   learned: Record<Language, LearnedWords>;
   custom: Record<Language, string[]>;
 };
 export const STORAGE_KEY = 't9-simulator:v1';
+export const SENT_LIMIT = 5;
 export const initialState = (): State => ({
   version: 1,
   settings: { language: 'de', mode: 't9', casing: 'auto', sound: false, vibration: false },
-  active: { text: '', sequence: '' }, drafts: [], sent: [],
+  active: { text: '', sequence: '' }, sent: [],
   learned: { de: {}, en: {} }, custom: { de: [], en: [] }
 });
 
@@ -33,11 +33,11 @@ export function parseState(raw: string | null): State {
     state.settings.vibration = data.settings?.vibration === true;
     state.active.text = typeof data.active?.text === 'string' ? data.active.text.slice(0, 100000) : '';
     state.active.sequence = /^[2-9]{1,100}$/.test(data.active?.sequence) ? data.active.sequence : '';
-    for (const folder of ['drafts', 'sent'] as const) {
-      if (Array.isArray(data[folder])) state[folder] = data[folder].filter((message: Message) =>
+    if (Array.isArray(data.sent)) {
+      state.sent = data.sent.filter((message: Message) =>
         message && typeof message.id === 'string' && typeof message.text === 'string' &&
         typeof message.date === 'number' && Number.isFinite(message.date)
-      ).slice(0, 100);
+      ).slice(0, SENT_LIMIT);
     }
     for (const language of ['de', 'en'] as const) {
       if (Array.isArray(data.custom?.[language])) state.custom[language] = data.custom[language]
